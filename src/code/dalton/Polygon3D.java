@@ -5,36 +5,41 @@ import java.awt.Color;
 public class Polygon3D 
 {
 
-	private double[] x, y, z, pos, newX, newY;
+	private Point3D[] points;
+	private double[] pos, newX, newY;
 	private Color c;
 	private PolygonObj drawablePolygon;
 	private double averageDistance = 0, xt, yt, zt;
 	private boolean draw = true;
 	
-	public Polygon3D(double[] x, double[] y, double[] z, Color c)
+	public Polygon3D(Point3D[] points, Color c)
 	{
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.points = points;
 		this.c = c;
 		createPolygon();
 	}
 	
-	// The average distance is the average t value
-	private void createPolygon()
+	public Polygon3D(Color c, Point3D... points)
 	{
-		drawablePolygon = new PolygonObj(new double[x.length], new double[x.length], c);
+		this.points = points;
+		this.c = c;
+		createPolygon();
+	}
+	
+	public void createPolygon()
+	{
+		drawablePolygon = new PolygonObj(new double[points.length], new double[points.length], c);
 	}
 	
 	public void updatePolygon()
 	{
-		newX = new double[x.length];
-		newY = new double[x.length];
+		newX = new double[points.length];
+		newY = new double[points.length];
 		draw = true;
 		applyTranslation();
-		for (int i = 0; i < x.length; i++)
+		for (int i = 0; i < points.length; i++)
 		{
-			pos = Calc.calculatePositionP(Camera.viewFrom, Camera.viewTo, x[i], y[i], z[i]);
+			pos = Calc.calculatePositionP(Camera.viewFrom, Camera.viewTo, points[i].getX(), points[i].getY(), points[i].getZ());
 			newX[i] = (Scratch.doom.getWidth()/2 - Calc.focusPos[0]) + pos[0] * Camera.zoom;
 			newY[i] = (Scratch.doom.getHeight()/2 - Calc.focusPos[1]) + pos[1] * Camera.zoom;
 			// t determines if the object is in front or behind us
@@ -54,13 +59,16 @@ public class Polygon3D
 		zt = zm;
 	}
 	
+	//https://en.wikipedia.org/wiki/Weiler%E2%80%93Atherton_clipping_algorithm
+
+	
 	private void applyTranslation()
 	{
-		for (int i = 0; i < x.length; i++)
+		for (int i = 0; i < points.length; i++)
 		{
-			x[i] += xt;
-			y[i] += yt;
-			z[i] += zt;
+			points[i].setX(points[i].getX() + xt);
+			points[i].setY(points[i].getY() + yt);
+			points[i].setZ(points[i].getZ() + zt);
 		}
 		xt = 0;
 		yt = 0;
@@ -70,18 +78,18 @@ public class Polygon3D
 	private double getDistance()
 	{
 		double total = 0;
-		for (int i = 0; i < x.length; i++)
+		for (int i = 0; i < points.length; i++)
 		{
 			total += getDistanceToPoint(i);
 		}
-		return total/x.length;
+		return total/points.length;
 	}
 	
 	private double getDistanceToPoint(int i)
 	{
-		return Math.sqrt((Camera.viewFrom[0] - x[i])*(Camera.viewFrom[0] - x[i]) + 
-				(Camera.viewFrom[1] - y[i])*(Camera.viewFrom[1] - y[i]) + 
-				(Camera.viewFrom[2] - z[i])*(Camera.viewFrom[2] - z[i]));
+		return Math.sqrt((Camera.viewFrom[0] - points[i].getX())*(Camera.viewFrom[0] - points[i].getX()) + 
+				(Camera.viewFrom[1] - points[i].getY())*(Camera.viewFrom[1] - points[i].getY()) + 
+				(Camera.viewFrom[2] - points[i].getZ())*(Camera.viewFrom[2] - points[i].getZ()));
 	}
 
 	private void lighting()
@@ -96,29 +104,13 @@ public class Polygon3D
 		if (drawablePolygon.getLighting() < 0)
 			drawablePolygon.setLighting(0);
 	}
-	
-	public double[] getX() {
-		return x;
+
+	public Point3D[] getPoints() {
+		return points;
 	}
 
-	public void setX(double[] x) {
-		this.x = x;
-	}
-
-	public double[] getY() {
-		return y;
-	}
-
-	public void setY(double[] y) {
-		this.y = y;
-	}
-
-	public double[] getZ() {
-		return z;
-	}
-
-	public void setZ(double[] z) {
-		this.z = z;
+	public void setPoints(Point3D[] points) {
+		this.points = points;
 	}
 
 	public double getAverageDistance() {

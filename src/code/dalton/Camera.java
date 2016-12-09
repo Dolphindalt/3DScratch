@@ -56,6 +56,22 @@ public class Camera implements MouseMotionListener
 		{
 			System.exit(0);
 		}
+		if (KeyManager.u)
+		{
+		    Screen.rectangles.get(0).translateRectangle(-1, 0, 0);
+		}
+		if (KeyManager.h)
+		{
+		    Screen.rectangles.get(0).translateRectangle(0, -1, 0);
+		}
+		if (KeyManager.j)
+		{
+		    Screen.rectangles.get(0).translateRectangle(1, 0, 0);
+		}
+		if (KeyManager.k)
+		{
+		    Screen.rectangles.get(0).translateRectangle(0, 1, 0);
+		}
 		Vector moveVector = new Vector(xMove, yMove, zMove);
 		moveTo(viewFrom[0] + moveVector.getX() * movementSpeed, viewFrom[1] + moveVector.getY() * movementSpeed, viewFrom[2] + moveVector.getZ() * movementSpeed);
 	}

@@ -2,6 +2,7 @@ package code.dalton;
 
 import java.awt.Color;
 
+@Deprecated
 public class Rectangle
 {
 
@@ -9,7 +10,6 @@ public class Rectangle
     private double width, length, height, rotation, x1, x2, x3, x4, y1, y2, y3, y4, xt, yt, zt;
     private double[] rotationValues, angle;
     private Polygon3D[] polygons;
-    private Polygon3D collisionBox;
     private Color c;
     
     public Rectangle(double x, double y, double z, double width, double length, double height, Color c)
@@ -30,8 +30,6 @@ public class Rectangle
         Screen.polygon3ds.add(polygons[4]);
         polygons[5] = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x,y,z+height), new Point3D(x,y+length,z+height), new Point3D(x,y+length,z));
         Screen.polygon3ds.add(polygons[5]);
-        collisionBox = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x+width,y,z), new Point3D(x+width,y+length,z), new Point3D(x,y+length,z),
-        new Point3D(x,y,z+height), new Point3D(x+width,y,z+height), new Point3D(x+width,y+length,z+height), new Point3D(x,y+length,z+height));
         
         this.c = c;
         this.location = new Point3D(x, y, z);
@@ -39,7 +37,7 @@ public class Rectangle
         this.length = length;
         this.height = height;
         
-        Screen.rectangles.add(this);
+        //Screen.rectangles.add(this);
         
         setRotationValues();
         updatePolygons();
@@ -195,13 +193,19 @@ public class Rectangle
     
     private void applyTranslation()
     {
+    	Polygon3D[] temp = polygons; 
         for (int i = 0; i < polygons.length; i++)
         {
-            polygons[i].translatePolygon(xt, yt, zt);
+            temp[i].translatePolygon(xt, yt, zt);
         }
-        location.setX(location.getX() + xt);
-        location.setY(location.getY() + yt);
-        location.setZ(location.getZ() + zt);
+        double lx = location.getX() + xt;
+        double ly = location.getY() + yt;
+        double lz = location.getZ() + zt;
+
+        polygons = temp;
+        location.setX(lx);
+        location.setY(ly);
+        location.setZ(lz);
         xt = 0;
         yt = 0;
         zt = 0;
@@ -213,9 +217,14 @@ public class Rectangle
         {
             Screen.polygon3ds.remove(polygons[i]);
         }
-        Screen.rectangles.remove(this);
+        //Screen.rectangles.remove(this);
     }
 
+    public int getNumberOfFaces()
+    {
+    	return this.polygons.length;
+    }
+    
     public Color getC() {
         return c;
     }
@@ -235,10 +244,9 @@ public class Rectangle
     public Polygon3D[] getPolygons() {
         return polygons;
     }
-    
-    public Polygon3D getCollisionBox()
-    {
-        return this.collisionBox;
-    }
+
+	public Point3D getLocation() {
+		return location;
+	}
     
 }

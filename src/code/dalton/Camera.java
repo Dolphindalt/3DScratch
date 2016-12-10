@@ -1,6 +1,7 @@
 package code.dalton;
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -56,21 +57,34 @@ public class Camera implements MouseMotionListener
 		{
 			System.exit(0);
 		}
+		if (KeyManager.z)
+		{
+		    Shape3D clipped = Screen.shape3ds.get(0).clip(Screen.shape3ds.get(1));
+		    if (clipped.getNumberOfFaces() == 0)
+		    {
+		    	Screen.ctext = "The polygons did not intercept!";
+		    }
+		    else
+		    {
+		    	Screen.ctext = "Number of faces: " + clipped.getNumberOfFaces();
+		    }
+		    clipped.addShapeToSimulation(Color.MAGENTA);
+		}
 		if (KeyManager.u)
 		{
-		    Screen.rectangles.get(0).translateRectangle(-1, 0, 0);
+			Screen.shape3ds.get(0).translateShape3D(0, 1, 0);
 		}
 		if (KeyManager.h)
 		{
-		    Screen.rectangles.get(0).translateRectangle(0, -1, 0);
+			Screen.shape3ds.get(0).translateShape3D(-1, 0, 0);
 		}
 		if (KeyManager.j)
 		{
-		    Screen.rectangles.get(0).translateRectangle(1, 0, 0);
+			Screen.shape3ds.get(0).translateShape3D(0, -1, 0);
 		}
 		if (KeyManager.k)
 		{
-		    Screen.rectangles.get(0).translateRectangle(0, 1, 0);
+			Screen.shape3ds.get(0).translateShape3D(1, 0, 0);
 		}
 		Vector moveVector = new Vector(xMove, yMove, zMove);
 		moveTo(viewFrom[0] + moveVector.getX() * movementSpeed, viewFrom[1] + moveVector.getY() * movementSpeed, viewFrom[2] + moveVector.getZ() * movementSpeed);

@@ -36,7 +36,8 @@ public class PolygonObj
 	{
 		if (draw)
 		{
-			g.setColor(new Color((int) (c.getRed() * lighting), (int) (c.getGreen() * lighting), (int) (c.getBlue() * lighting)));
+			g.setColor(
+					new Color((int) (c.getRed() * lighting), (int) (c.getGreen() * lighting), (int) (c.getBlue() * lighting)));
 			g.fillPolygon(p);
 		}
 	}

@@ -15,8 +15,11 @@ public class Screen extends JPanel
 {
     private static final long serialVersionUID = 1L;
     
+    public static String ctext = "No data";
+    
     public static List<Polygon3D> polygon3ds = new ArrayList<Polygon3D>();
-    public static List<Rectangle> rectangles = new ArrayList<Rectangle>();
+    public static List<Shape3D> shape3ds = new ArrayList<Shape3D>();
+    //public static List<Rectangle> rectangles = new ArrayList<Rectangle>();
     
     public static double[] lightDirection = new double[] {1, 1, 1}; 
     
@@ -36,8 +39,9 @@ public class Screen extends JPanel
         addKeyListener(km);
         setFocusable(true);
         
-        new Rectangle(0, 0, 0, 5, 5, 5, Color.GREEN);
-        new Rectangle(25, 0, 0, 1, 1, 1, Color.RED);
+        //new Rectangle(0, 0, 0, 5, 5, 5, Color.GREEN);
+        shape3ds.add(new Shape3D(Color.RED, 0, 0, 0, 2, 2, 2));
+        shape3ds.add(new Shape3D(Color.ORANGE, 5, 5, 0, 2, 2, 2));
     }
     
     public void paintComponent(Graphics g)  
@@ -47,13 +51,17 @@ public class Screen extends JPanel
         km.tick();
         g.drawString("ViewFrom: " + Camera.viewFrom[0] + ", " + Camera.viewFrom[1] + ", " + Camera.viewFrom[2], 20, 20);
         g.drawString("ViewTo: " + Camera.viewTo[0] + ", " + Camera.viewTo[1] + ",   " + Camera.viewTo[2], 20, 40);
+        g.drawString(ctext, 20, 60);
         camera.checkInput();
         Calc.setCalculations();
         
         light();
         
-        for (int i = 0; i < rectangles.size(); i++)
-            rectangles.get(i).updatePolygons();
+        for (int i = 0; i < shape3ds.size(); i++)
+        	shape3ds.get(i).updateFaces();
+        
+        //for (int i = 0; i < rectangles.size(); i++)
+            //rectangles.get(i).updatePolygons();
         
         for (int i = 0; i < polygon3ds.size(); i++)
             polygon3ds.get(i).updatePolygon();

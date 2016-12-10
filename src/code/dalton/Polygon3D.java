@@ -12,6 +12,13 @@ public class Polygon3D
 	private double averageDistance = 0, xt, yt, zt;
 	private boolean draw = true;
 	
+	public Polygon3D(Color c)
+	{
+		points = new Point3D[0];
+		this.c = c;
+		createPolygon();
+	}
+	
 	public Polygon3D(Point3D[] points, Color c)
 	{
 		this.points = points;
@@ -59,8 +66,119 @@ public class Polygon3D
 		zt = zm;
 	}
 	
+	public boolean isPointInside(Point3D point)
+	{
+		double det = this.getPointFaceDeterminant(point);
+		if (det<=0)
+		{
+			return true;
+		} else return false;
+	}
+	
+	// Convex shapes only!!!
+	public Point3D getIntersectionPoint(Point3D ray1, Point3D ray2)
+	{
+		double det1 = this.getPointFaceDeterminant(ray1);
+		double det2 = this.getPointFaceDeterminant(ray2);
+		
+		if (det1 == det2)
+		{
+			//paralell line, so use middle point
+			Point3D av = new Point3D();
+			av = av.add(ray1, ray2);
+			av = av.scale(0.5);
+			return av;
+		}
+		else
+		{
+			Point3D intersect = new Point3D();
+			intersect = intersect.substract(ray2, ray1);
+			intersect = intersect.scale((0 - det1)/(det2-det1));
+			intersect = intersect.add(ray1);
+			return intersect;
+		}
+	}
+	
 	//https://en.wikipedia.org/wiki/Weiler%E2%80%93Atherton_clipping_algorithm
-
+	//www.jhave.org/learner/misc/sutherlandhodgman/sutherlandhogdmanclipping.shtml
+	// Strange that I am using a class called Polygon3D as a flat dimensional face
+	public Polygon3D clipFace(Polygon3D clippingFace)
+	{
+		Polygon3D workingFace = new Polygon3D(c);
+		
+		for(int i = 0; i < this.getNumberOfEdges(); i++)
+		{
+			Point3D p1 = this.getStartingEdge(i);
+			Point3D p2 = this.getEndEdge(i);
+			
+			if (clippingFace.isPointInside(p1) && clippingFace.isPointInside(p2))
+			{
+				// add end point
+				workingFace.addVertex(p2);
+			}
+			else if (clippingFace.isPointInside(p1) && clippingFace.isPointInside(p2)==false)
+			{
+				// only intersection is added
+				Point3D intersection = clippingFace.getIntersectionPoint(p1, p2);
+				workingFace.addVertex(intersection);
+			}
+			else if (clippingFace.isPointInside(p1)==false && clippingFace.isPointInside(p2)==false)
+			{
+				// outside line, nothing
+			}
+			else
+			{
+				// end vertex inside and starting outside so intercept and end point are added
+				Point3D intersection = clippingFace.getIntersectionPoint(p1, p2);
+				workingFace.addVertex(intersection);
+				workingFace.addVertex(p2);
+			}
+		}
+		
+		if (workingFace.getNumberOfEdges()>=3)
+		{
+			return workingFace;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public void rewind(Point3D inp)
+	{
+		if (!this.isPointInside(inp))
+		{
+			Point3D[] verts = new Point3D[this.points.length];
+			for (int i = this.points.length; i > 0; i--)
+			{
+				verts[i] = this.points[i];
+			}
+			this.points = verts;
+		}
+	}
+	
+	private double getPointFaceDeterminant(Point3D point)
+	{
+		if (this.points.length<3)
+			throw new RuntimeException("A face has less then three vertices");
+		Point3D a = points[0];
+		Point3D b = points[1];
+		Point3D c = points[2];
+		Point3D x = point;
+		
+		Point3D bDash = new Point3D();
+		bDash = bDash.substract(b, x);
+		Point3D cDash = new Point3D();
+		cDash = cDash.substract(c, x);
+		Point3D xDash = new Point3D();
+		xDash = xDash.substract(x, a);
+		
+		//http://www.mathsisfun.com/algebra/matrix-determinant.html
+		double det = bDash.getX()*(cDash.getY()*xDash.getZ()-cDash.getZ()*xDash.getY())-bDash.getY()*
+				(cDash.getX()*xDash.getZ()-cDash.getZ()*xDash.getX())+bDash.getZ()*(cDash.getX()*xDash.getY()-cDash.getY()*xDash.getX());
+		return det;
+	}
 	
 	private void applyTranslation()
 	{
@@ -105,6 +223,43 @@ public class Polygon3D
 			drawablePolygon.setLighting(0);
 	}
 
+	public void addVertex(Point3D point)
+	{	
+		Point3D[] re = new Point3D[this.getPoints().length+1]; 
+		for (int i = 0; i < this.points.length; i++)
+		{
+			re[i] = this.points[i];
+		}
+		re[this.getPoints().length] = point;
+		this.points = re;
+		createPolygon();
+	}
+	
+	public Point3D getStartingEdge(int n)
+	{
+		return this.points[n];
+	}
+	
+	public Point3D getEndEdge(int n)
+	{
+		return this.points[((n + 1)%this.points.length)]; //loop for last edge
+	}
+	
+	public Point3D getVertex(int index)
+	{
+		return this.points[index];
+	}
+	
+	public int getNumberOfEdges()
+	{
+		return this.points.length;
+	}
+	
+	public int getNumberOfSegments()
+	{
+		return this.points.length-2;
+	}
+	
 	public Point3D[] getPoints() {
 		return points;
 	}
@@ -139,6 +294,14 @@ public class Polygon3D
 
 	public PolygonObj getDrawablePolygon() {
 		return drawablePolygon;
+	}
+
+	public Color getC() {
+		return c;
+	}
+
+	public void setC(Color c) {
+		this.c = c;
 	}
 	
 }

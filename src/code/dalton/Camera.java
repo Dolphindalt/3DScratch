@@ -13,6 +13,8 @@ public class Camera implements MouseMotionListener
 	public static double[] viewTo = new double[]{ 0, 0, 0 };
 	public static double mouseX = 0, mouseY = 0, movementSpeed = 1, zoom = 1000;
 	
+	private long last = 0;
+	
 	private double vertLook = -0.9, horLook = 0, horRotSpeed = 900, vertRotSpeed = 2200;
 	private Robot robot;
 	
@@ -59,16 +61,27 @@ public class Camera implements MouseMotionListener
 		}
 		if (KeyManager.z)
 		{
-		    Shape3D clipped = Screen.shape3ds.get(0).clip(Screen.shape3ds.get(1));
-		    if (clipped.getNumberOfFaces() == 0)
-		    {
-		    	Screen.ctext = "The polygons did not intercept!";
-		    }
-		    else
-		    {
-		    	Screen.ctext = "Number of faces: " + clipped.getNumberOfFaces();
-		    }
-		    clipped.addShapeToSimulation(Color.MAGENTA);
+			if ((System.currentTimeMillis() - last) > 1000)
+			{
+				Shape3D clipped = Screen.shape3ds.get(0).clip(Screen.shape3ds.get(1));
+		    	if (clipped.getNumberOfFaces() == 0)
+		    	{
+		    		Screen.ctext = "The polygons did not intercept!";
+		    	}
+		    	else
+		    	{
+		    		Screen.ctext = "Number of faces: " + clipped.getNumberOfFaces();
+		    	}
+		    	clipped.addShapeToSimulation(Color.MAGENTA);
+		    	last = System.currentTimeMillis();
+			}
+		}
+		if (KeyManager.x)
+		{
+			if ((System.currentTimeMillis() - last) > 1000)
+			{
+				last = System.currentTimeMillis();
+			}
 		}
 		if (KeyManager.u)
 		{

@@ -235,6 +235,12 @@ public class Polygon3D
 		createPolygon();
 	}
 	
+	@Override
+	public Object clone()
+	{
+		return new Polygon3D(this.getC(), this.getPoints());
+	}
+	
 	public Point3D getStartingEdge(int n)
 	{
 		return this.points[n];

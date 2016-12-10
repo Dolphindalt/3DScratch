@@ -89,7 +89,7 @@ public class Shape3D
 	
 	public Shape3D clip(Shape3D cp)
 	{
-		Shape3D wp = this;
+		Shape3D wp = (Shape3D) clone();
 		for (int i = 0; i < cp.getNumberOfFaces(); i++)
 		{
 			wp = clip(wp, cp.getFace(i));
@@ -137,6 +137,12 @@ public class Shape3D
 			Screen.polygon3ds.remove(faces[i]);
 		}
 		Screen.shape3ds.remove(this);
+	}
+	
+	@Override
+	public Object clone()
+	{
+		return new Shape3D(this.faces);
 	}
 	
 }

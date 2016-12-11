@@ -308,6 +308,7 @@ public class Polygon3D
 
 	public void setC(Color c) {
 		this.c = c;
+		createPolygon();
 	}
 	
 }

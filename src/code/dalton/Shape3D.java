@@ -7,6 +7,8 @@ public class Shape3D
 
 	private Polygon3D[] faces;
 	private double xm = 0, ym = 0, zm = 0;
+	private double width, height, length;
+	private Color c;
 	
 	public Shape3D() 
 	{
@@ -21,6 +23,10 @@ public class Shape3D
 	public Shape3D(Color c, double x, double y, double z, double width, double length, double height)
 	{
         faces = new Polygon3D[6];
+        this.width = width;
+        this.length = length;
+        this.height = height;
+        this.c = c;
         
         faces[0] = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x+width,y,z), new Point3D(x+width,y+length,z), new Point3D(x,y+length,z));
         Screen.polygon3ds.add(faces[0]);
@@ -34,6 +40,8 @@ public class Shape3D
         Screen.polygon3ds.add(faces[4]);
         faces[5] = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x,y,z+height), new Point3D(x,y+length,z+height), new Point3D(x,y+length,z));
         Screen.polygon3ds.add(faces[5]);
+        
+        Screen.shape3ds.add(this);
 	}
 	
 	public void updateFaces()
@@ -120,6 +128,24 @@ public class Shape3D
 		return out;
 	}
 	
+	// MUST USE A RECTANGLE CONSTRUCTOR
+	public void setLocationRelativeToFaceZero(double x, double y, double z)
+	{
+		removeAllFaces();
+        faces[0] = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x+width,y,z), new Point3D(x+width,y+length,z), new Point3D(x,y+length,z));
+        Screen.polygon3ds.add(faces[0]);
+        faces[1] = new Polygon3D(c, new Point3D(x,y,z+height), new Point3D(x+width,y,z+height), new Point3D(x+width,y+length,z+height), new Point3D(x,y+length,z+height));
+        Screen.polygon3ds.add(faces[1]);
+        faces[2] = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x,y,z+height), new Point3D(x+width,y,z+height), new Point3D(x+width,y,z));
+        Screen.polygon3ds.add(faces[2]);
+        faces[3] = new Polygon3D(c, new Point3D(x+width,y,z), new Point3D(x+width,y,z+height), new Point3D(x+width,y+length,z+height), new Point3D(x+width,y+length,z));
+        Screen.polygon3ds.add(faces[3]);
+        faces[4] = new Polygon3D(c, new Point3D(x,y+length,z), new Point3D(x,y+length,z+height), new Point3D(x+width,y+length,z+height), new Point3D(x+width,y+length,z));
+        Screen.polygon3ds.add(faces[4]);
+        faces[5] = new Polygon3D(c, new Point3D(x,y,z), new Point3D(x,y,z+height), new Point3D(x,y+length,z+height), new Point3D(x,y+length,z));
+        Screen.polygon3ds.add(faces[5]);
+	}
+	
 	public void addShapeToSimulation(Color c)
 	{
 		for (int i = 0; i < faces.length; i++)
@@ -137,6 +163,22 @@ public class Shape3D
 			Screen.polygon3ds.remove(faces[i]);
 		}
 		Screen.shape3ds.remove(this);
+	}
+	
+	public void removeAllFaces()
+	{
+		for (int i = 0; i < faces.length; i++)
+		{
+			Screen.polygon3ds.remove(faces[i]);
+		}
+	}
+	
+	public void setColor(Color c)
+	{
+		for (Polygon3D p : faces)
+		{
+			p.setC(c);
+		}
 	}
 	
 	@Override

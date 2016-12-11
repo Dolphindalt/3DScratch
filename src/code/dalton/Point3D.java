@@ -11,17 +11,6 @@ public class Point3D
     	
     }
     
-    /*public Point3D(double x, double y, double z)
-    {
-        double length = Math.sqrt(x*x + y*y + z*z);
-        if (length > 0)
-        {
-            this.x = x/length;
-            this.y = y/length;
-            this.z = z/length;
-        }
-    }*/
-    
     public Point3D(double x, double y, double z)
     {
         this.x = x;
